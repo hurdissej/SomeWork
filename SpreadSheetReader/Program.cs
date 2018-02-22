@@ -11,26 +11,29 @@ namespace SpreadSheetReader
     {
         static void Main(string[] args)
         {
-            var dump = getExcelDump(@"C:\Users\elliot.hurdiss\Documents\FullData.csv");
+            var dump = getExcelDump(@"C:\Users\elliot.hurdiss\Documents\BaseData.csv");
             var skus = GetSkus(dump);
-            var prices = GetMaxPrice(dump, skus);
-            var promoDates = new List<string>();
+            var promoDates = new Dictionary<string, List<string>>();
             foreach (var sku in skus)
             {
-                var promoPrice = prices[sku] * 0.9;
                 foreach (string[] t in dump)
                 {
                     if(t[2] != sku)
                         continue;
 
-                    if (Double.Parse(t[3]) < promoPrice)
+                    if (Double.Parse(t[3]) < Double.Parse(t[4])*0.9)
                     {
-                        promoDates.Add($"Date {t[0]} is promoted for sku {t[2]} in store {t[1]}");
+                        if (promoDates.TryGetValue(t[2], out List<string> skuPrice))
+                        {
+                            promoDates[t[2]].Add($"Date {t[0]} is promoted for sku {t[2]} in store {t[1]}");
+                        }
+                        else
+                        {
+                            promoDates.Add(t[2], new List<string>{ $"Date {t[0]} is promoted for sku {t[2]} in store {t[1]}" });
+                        }
                     }
                 }
             }
-
-            promoDates.ForEach(Console.WriteLine);
         }
 
         private static List<string[]> getExcelDump(string path)
