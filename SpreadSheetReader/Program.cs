@@ -144,16 +144,16 @@ namespace SpreadSheetReader
         {
             foreach (var row in dump)
             {
-                var Date = Convert.ToDateTime(row[0]);
-                var ActualPrice = Convert.ToDouble(row[3]);
-                var BasePrice = Convert.ToDouble(row[4]);
+                var date = Convert.ToDateTime(row[0]);
+                var actualPrice = Convert.ToDouble(row[3]);
+                var basePrice = Convert.ToDouble(row[4]);
                 yield return new ExcelRow
                 {
-                    Date = Date,
+                    Date = date,
                     Store = row[1],
                     SKU = row[2],
-                    ActualPrice = ActualPrice,
-                    BasePrice = BasePrice
+                    ActualPrice = actualPrice,
+                    BasePrice = basePrice
                 };
             }
         }
