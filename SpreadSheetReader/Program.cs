@@ -82,9 +82,8 @@ namespace SpreadSheetReader
                 }
             }
             if (currentPromotion != null)
-            {
                 result.Add(currentPromotion);
-            }
+            
             return result;
         }
 
