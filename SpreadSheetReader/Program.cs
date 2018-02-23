@@ -7,14 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace SpreadSheetReader
 {
-    //public class PromotionDay
-    //{
-    //    public DateTime Day { get; set; }
-    //    public string Sku { get; set; }
-    //    public string Store { get; set; }
-    //}
-
-    public class Promotion
+   public class Promotion
     {
         public Promotion(DateTime startdate, DateTime endDate, string sku, string store)
         {
