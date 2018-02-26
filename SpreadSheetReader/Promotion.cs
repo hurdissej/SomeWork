@@ -13,6 +13,7 @@ namespace SpreadSheetReader
             StartDate = startdate;
             EndDate = endDate;
             Sku = sku;
+            InitialPrice = price;
             DaysRaninEachStore = new Dictionary<string, StoreVolume>() { { store, new StoreVolume(1, volume, price) } };
         }
 

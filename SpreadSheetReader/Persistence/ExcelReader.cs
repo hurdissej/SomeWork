@@ -27,7 +27,7 @@ namespace SpreadSheetReader.Persistence
         public static void WriteToFile(IEnumerable<Promotion> promotions)
         {
             string date = DateTime.Now.ToString("yy-MM-dd") + "-" + DateTime.Now.Hour + "_" + DateTime.Now.Minute;
-            var filePath = $@"C:\Users\elliot.hurdiss\Documents\PromotionOutput-{date}.csv";
+            var filePath = $@"C:\Users\andy.bainton\Documents\PromotionOutput-{date}.csv";
             var result = new List<string[]>();
             result.Add(new[] { "ID", "StartDate", "EndDate", "SkuCode", "Promoted Price", "Store", "Days Ran in Store", "Volume By Store" });
             foreach (var promotion in promotions)

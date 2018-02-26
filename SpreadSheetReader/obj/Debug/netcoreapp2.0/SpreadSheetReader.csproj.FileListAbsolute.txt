@@ -9,3 +9,14 @@ c:\users\elliot.hurdiss\source\repos\SpreadSheetReader\SpreadSheetReader\obj\Deb
 c:\users\elliot.hurdiss\source\repos\SpreadSheetReader\SpreadSheetReader\obj\Debug\netcoreapp2.0\SpreadSheetReader.AssemblyInfo.cs
 c:\users\elliot.hurdiss\source\repos\SpreadSheetReader\SpreadSheetReader\obj\Debug\netcoreapp2.0\SpreadSheetReader.dll
 c:\users\elliot.hurdiss\source\repos\SpreadSheetReader\SpreadSheetReader\obj\Debug\netcoreapp2.0\SpreadSheetReader.pdb
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\bin\Debug\netcoreapp2.0\SpreadSheetReader.deps.json
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\bin\Debug\netcoreapp2.0\SpreadSheetReader.runtimeconfig.json
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\bin\Debug\netcoreapp2.0\SpreadSheetReader.runtimeconfig.dev.json
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\bin\Debug\netcoreapp2.0\SpreadSheetReader.dll
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\bin\Debug\netcoreapp2.0\SpreadSheetReader.pdb
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\obj\Debug\netcoreapp2.0\SpreadSheetReader.csprojResolveAssemblyReference.cache
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\obj\Debug\netcoreapp2.0\SpreadSheetReader.csproj.CoreCompileInputs.cache
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\obj\Debug\netcoreapp2.0\SpreadSheetReader.AssemblyInfoInputs.cache
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\obj\Debug\netcoreapp2.0\SpreadSheetReader.AssemblyInfo.cs
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\obj\Debug\netcoreapp2.0\SpreadSheetReader.dll
+C:\Users\andy.bainton\SomeWork\SpreadSheetReader\obj\Debug\netcoreapp2.0\SpreadSheetReader.pdb
