@@ -63,6 +63,6 @@ namespace SpreadSheetReader
             return result;
         }
 
-        private static bool IsPromotedDay(double basePrice, double actualPrice) => actualPrice < (basePrice * 0.95);
+        private static bool IsPromotedDay(double basePrice, double actualPrice) => actualPrice < basePrice * 0.95;
     }
 }
