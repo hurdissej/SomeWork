@@ -9,35 +9,47 @@ using System.Text;
 
 namespace SpreadSheetReader
 {
+    public class StoreVolume
+    {
+        public StoreVolume(int initialDays, double dayOneVolume)
+        {
+            DaysRanInStore = initialDays;
+            TotalVolume = dayOneVolume;
+        }
+        public int DaysRanInStore { get; set; }
+        public double TotalVolume { get; set; }
+    }
    public class Promotion
     {
-        public Promotion(DateTime startdate, DateTime endDate, double price, string sku, string store)
+
+        public Promotion(DateTime startdate, DateTime endDate, double price, string sku, string store, double volume)
         {
             StartDate = startdate;
             EndDate = endDate;
             Sku = sku;
             InitialPrice = price;
-            DaysRaninEachStore = new Dictionary<string, int>() {{store,1}};
+            DaysRaninEachStore = new Dictionary<string, StoreVolume>() {{store, new StoreVolume(1 , volume) }};
         }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Sku { get; set; }
         public double InitialPrice { get; set; }
-        public Dictionary<string, int> DaysRaninEachStore { get; set; }
+        public Dictionary<string, StoreVolume> DaysRaninEachStore { get; set; }
 
-        public void PromotionHappened(string store)
+        public void PromotionHappened(string store, double volume)
         {
-            IncrementStoreDate(store);
+            IncrementStoreDate(store, volume);
         }
-        private void IncrementStoreDate(string store)
+        private void IncrementStoreDate(string store, double volumeOnDay)
         {
             if (DaysRaninEachStore.TryGetValue(store, out var storeCount))
             {
-                DaysRaninEachStore[store] = storeCount + 1;
+                DaysRaninEachStore[store].DaysRanInStore = storeCount.DaysRanInStore + 1;
+                DaysRaninEachStore[store].TotalVolume = storeCount.TotalVolume + volumeOnDay;
             }
             else
             {
-                DaysRaninEachStore.Add(store, 1);
+                DaysRaninEachStore.Add(store, new StoreVolume(1, volumeOnDay));
             }
 
         }
@@ -50,13 +62,14 @@ namespace SpreadSheetReader
         public string SKU { get; set; }
         public double ActualPrice { get; set; }
         public double BasePrice { get; set; }
+        public double Volume { get; set; }
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            var dump = getExcelDump(@"C:\Users\elliot.hurdiss\Documents\BaseData.csv");
+            var dump = getExcelDump(@"C:\Users\elliot.hurdiss\Documents\VolumeTest.csv");
             var rows = ParseRows(dump).ToList();
             var ordered =  rows.OrderBy(x => x.SKU).ThenBy(x => x.Date).ThenBy(x => x.Store);
             var promotions = GetPromotions(ordered);
@@ -83,20 +96,20 @@ namespace SpreadSheetReader
                 //If it is a new promotion
                 if (currentPromotion == null)
                 {
-                    currentPromotion = new Promotion(row.Date, row.Date, row.ActualPrice, row.SKU, row.Store);
+                    currentPromotion = new Promotion(row.Date, row.Date, row.ActualPrice, row.SKU, row.Store, row.Volume);
                     continue;
                 }
                 // Same Date, Same SKU - Then add the store in 
                 if (currentPromotion.EndDate == row.Date && row.SKU == currentPromotion.Sku)
                 {
-                    currentPromotion.PromotionHappened(row.Store);
+                    currentPromotion.PromotionHappened(row.Store, row.Volume);
                     continue;
                 }
                 // RowDate is day after Previous Promotion End Date && Same SKU -
                 if (row.Date == currentPromotion.EndDate.AddDays(1) && row.SKU == currentPromotion.Sku)
                 {
                     currentPromotion.EndDate = row.Date;
-                    currentPromotion.PromotionHappened(row.Store);
+                    currentPromotion.PromotionHappened(row.Store, row.Volume);
                 }
             }
             if (currentPromotion != null)
@@ -128,10 +141,10 @@ namespace SpreadSheetReader
             string date = DateTime.Now.ToString("yy-MM-dd") + "-" + DateTime.Now.Hour + "_" + DateTime.Now.Minute; 
             var filePath = $@"C:\Users\elliot.hurdiss\Documents\PromotionOutput-{date}.csv";
             var result = new List<string[]>();
-            result.Add(new []{"StartDate", "EndDate", "SkuCode", "Promoted Price", "Store", "Days Ran in Store"});
+            result.Add(new []{"StartDate", "EndDate", "SkuCode", "Promoted Price", "Store", "Days Ran in Store", "Volume By Store"});
             foreach (var promotion in promotions)
             {
-                result.AddRange(promotion.DaysRaninEachStore.Select(store => new[] {promotion.StartDate.ToString("d"), promotion.EndDate.ToString("d"), promotion.Sku, promotion.InitialPrice.ToString("N"), store.Key, store.Value.ToString()}));
+                result.AddRange(promotion.DaysRaninEachStore.Select(store => new[] {promotion.StartDate.ToString("d"), promotion.EndDate.ToString("d"), promotion.Sku, promotion.InitialPrice.ToString("N"), store.Key, store.Value.DaysRanInStore.ToString(), store.Value.TotalVolume.ToString() }));
             }
             StringBuilder sb = new StringBuilder();
             foreach (string[] t in result)
@@ -147,13 +160,15 @@ namespace SpreadSheetReader
                 var date = Convert.ToDateTime(row[0]);
                 var actualPrice = Convert.ToDouble(row[3]);
                 var basePrice = Convert.ToDouble(row[4]);
+                var volume = Convert.ToDouble(row[5]);
                 yield return new ExcelRow
                 {
                     Date = date,
                     Store = row[1],
                     SKU = row[2],
                     ActualPrice = actualPrice,
-                    BasePrice = basePrice
+                    BasePrice = basePrice,
+                    Volume = volume
                 };
             }
         }
