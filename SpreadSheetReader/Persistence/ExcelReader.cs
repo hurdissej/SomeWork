@@ -27,12 +27,12 @@ namespace SpreadSheetReader.Persistence
         public static void WriteToFile(IEnumerable<Promotion> promotions)
         {
             string date = DateTime.Now.ToString("yy-MM-dd") + "-" + DateTime.Now.Hour + "_" + DateTime.Now.Minute;
-            var filePath = $@"C:\Users\andy.bainton\Documents\PromotionOutput-{date}.csv";
+            var filePath = $@"C:\Users\elliot.hurdiss\Documents\PromotionOutput-{date}.csv";
             var result = new List<string[]>();
-            result.Add(new[] { "ID", "StartDate", "EndDate", "SkuCode", "Promoted Price", "Store", "Days Ran in Store", "Volume By Store" });
+            result.Add(new[] { "PromotionID", "StartDate", "EndDate", "SkuCode", "Promoted Price", "Store","Volume" });
             foreach (var promotion in promotions)
             {
-                result.AddRange(promotion.DaysRaninEachStore.Select(store => new[] { promotion.Id.ToString("N"), promotion.StartDate.ToString("d"), promotion.EndDate.ToString("d"), promotion.Sku, store.Value.InitialPrice.ToString("N"), store.Key, store.Value.DaysRanInStore.ToString(), store.Value.TotalVolume.ToString() }));
+                result.Add( new[] { promotion.Id.ToString("N"), promotion.StartDate.ToString("d"), promotion.EndDate.ToString("d"), promotion.Sku, promotion.PromotedPrice.ToString("N"), promotion.NumberOfStores.ToString(), promotion.Volume.ToString() });
             }
             StringBuilder sb = new StringBuilder();
             foreach (string[] t in result)
@@ -46,7 +46,7 @@ namespace SpreadSheetReader.Persistence
             var result = new Dictionary<string, int>();
             foreach(var row in dump)
             {
-                var store = row[1];
+                var store = row[0];
                 if(result.TryGetValue(store, out int numberOfStores))
                 {
                     result[store]++;
@@ -63,17 +63,18 @@ namespace SpreadSheetReader.Persistence
             foreach (var row in dump)
             {
                 var date = Convert.ToDateTime(row[0]);
-                var actualPrice = Convert.ToDouble(row[3]);
-                var basePrice = Convert.ToDouble(row[4]);
+                var actualPrice = Convert.ToDouble(row[4]);
+                var basePrice = Convert.ToDouble(row[6]);
                 var volume = Convert.ToDouble(row[5]);
                 yield return new ExcelRow
                 {
                     Date = date,
-                    Store = row[1],
-                    SKU = row[2],
+                    Customer = row[1],
+                    Store = row[2],
+                    SKU = row[3],
                     ActualPrice = actualPrice,
                     BasePrice = basePrice,
-                    Volume = volume
+                    Volume = volume,
                 };
             }
         }

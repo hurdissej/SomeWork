@@ -13,34 +13,18 @@ namespace SpreadSheetReader
             StartDate = startdate;
             EndDate = endDate;
             Sku = sku;
-            InitialPrice = price;
-            DaysRaninEachStore = new Dictionary<string, StoreVolume>() { { store, new StoreVolume(1, volume, price) } };
+            PromotedPrice = price;
+            Volume = volume;
+            NumberOfStores = Convert.ToInt32(store);
         }
 
         public Guid Id { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Sku { get; set; }
-        public double InitialPrice { get; set; }
-        public Dictionary<string, StoreVolume> DaysRaninEachStore { get; set; }
-
-        public void IncrementStoreCountAndVolume(string store, double volume, double priceOnDay)
-        {
-            IncrementStoreDate(store, volume, priceOnDay);
-        }
-        private void IncrementStoreDate(string store, double volumeOnDay, double priceOnDay)
-        {
-            if (DaysRaninEachStore.TryGetValue(store, out var storeCount))
-            {
-                DaysRaninEachStore[store].DaysRanInStore = storeCount.DaysRanInStore + 1;
-                DaysRaninEachStore[store].TotalVolume = storeCount.TotalVolume + volumeOnDay;
-            }
-            else
-            {
-                DaysRaninEachStore.Add(store, new StoreVolume(1, volumeOnDay, priceOnDay));
-            }
-
-        }
+        public double PromotedPrice { get; set; }
+        public double Volume { get; set; }
+        public int NumberOfStores { get; set; }
     }
 
     public class StoreVolume

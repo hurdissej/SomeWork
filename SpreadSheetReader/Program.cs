@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,18 +15,24 @@ namespace SpreadSheetReader
     {
         static void Main(string[] args)
         {
-            var rows = ExcelReader.ParsePromotionRows(ExcelReader.getExcelDump(@"C:\Users\andy.bainton\Documents\TestData.csv"));
-            var storeCount = ExcelReader.GetStoreCount(ExcelReader.getExcelDump(@"C:\Users\andy.bainton\Documents\TestHierarchy.csv"));
-            var ordered =  rows.OrderBy(x => x.Store).ThenBy(x => x.SKU).ThenBy(x => x.Date);
-            var promotions = GetStoreLevelPromotions(ordered);
-            ExcelReader.WriteToFile(promotions);
+            var sw = new Stopwatch();
+            var rows = ExcelReader.ParsePromotionRows(ExcelReader.getExcelDump(@"C:\Users\elliot.hurdiss\Documents\CustomerData.csv")).ToList();
+            sw.Start();
+            var storeLevelPromotions = GetStoreLevelPromotions(rows);
+            var timeForOne = sw.ElapsedMilliseconds;
+            sw.Restart();
+            var groupedPromotions = StoreCountPromotionProvider.GetStoreCountPromotions(rows);
+            var timeForTwo = sw.ElapsedMilliseconds;
+            sw.Stop();
+            ExcelReader.WriteToFile(groupedPromotions);
         }
 
-        private static IEnumerable<Promotion> GetStoreLevelPromotions(IEnumerable<ExcelRow> OrderedRows)
+        private static IEnumerable<Promotion> GetStoreLevelPromotions(List<ExcelRow> rows)
         {
+            var orderedRows = rows.OrderBy(x => x.Store).ThenBy(x => x.SKU).ThenBy(x => x.Date);
             var result = new List<Promotion>();
             Promotion currentPromotion = null;
-            foreach (var row in OrderedRows)
+            foreach (var row in orderedRows)
             {
                 //Check if promoted Day
                 if (!IsPromotedDay(row.BasePrice, row.ActualPrice))
@@ -47,14 +54,14 @@ namespace SpreadSheetReader
                 // Same Date, Same SKU - Then add the store in 
                 if (currentPromotion.EndDate == row.Date && row.SKU == currentPromotion.Sku)
                 {
-                    currentPromotion.IncrementStoreCountAndVolume(row.Store, row.Volume, row.ActualPrice);
+                   // currentPromotion.IncrementStoreCountAndVolume(row.Store, row.Volume, row.ActualPrice);
                     continue;
                 }
                 // RowDate is day after Previous Promotion End Date && Same SKU -
-                if (row.Date == currentPromotion.EndDate.AddDays(1) && row.SKU == currentPromotion.Sku && IsWithinAcceptableRange(currentPromotion.InitialPrice, row.ActualPrice))
+                if (row.Date == currentPromotion.EndDate.AddDays(1) && row.SKU == currentPromotion.Sku && IsWithinAcceptableRange(currentPromotion.PromotedPrice, row.ActualPrice))
                 {
                     currentPromotion.EndDate = row.Date;
-                    currentPromotion.IncrementStoreCountAndVolume(row.Store, row.Volume, row.ActualPrice);
+                   // currentPromotion.IncrementStoreCountAndVolume(row.Store, row.Volume, row.ActualPrice);
                     continue;
                 }
                 // This is now a back to back promo so we need to add our last promo to the results list and start a new one
