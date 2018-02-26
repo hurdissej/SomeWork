@@ -32,7 +32,7 @@ namespace SpreadSheetReader.Persistence
             result.Add(new[] { "ID", "StartDate", "EndDate", "SkuCode", "Promoted Price", "Store", "Days Ran in Store", "Volume By Store" });
             foreach (var promotion in promotions)
             {
-                result.AddRange(promotion.DaysRaninEachStore.Select(store => new[] { promotion.Id.ToString("N"), promotion.StartDate.ToString("d"), promotion.EndDate.ToString("d"), promotion.Sku, promotion.InitialPrice.ToString("N"), store.Key, store.Value.DaysRanInStore.ToString(), store.Value.TotalVolume.ToString() }));
+                result.AddRange(promotion.DaysRaninEachStore.Select(store => new[] { promotion.Id.ToString("N"), promotion.StartDate.ToString("d"), promotion.EndDate.ToString("d"), promotion.Sku, store.Value.InitialPrice.ToString("N"), store.Key, store.Value.DaysRanInStore.ToString(), store.Value.TotalVolume.ToString() }));
             }
             StringBuilder sb = new StringBuilder();
             foreach (string[] t in result)

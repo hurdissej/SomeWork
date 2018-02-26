@@ -14,8 +14,7 @@ namespace SpreadSheetReader
     {
         static void Main(string[] args)
         {
-            var dump = ExcelReader.getExcelDump(@"C:\Users\elliot.hurdiss\Documents\VolumeTest.csv");
-            var rows = ExcelReader.ParseRows(dump).ToList();
+            var rows = ExcelReader.ParseRows(ExcelReader.getExcelDump(@"C:\Users\elliot.hurdiss\Documents\VolumeTest.csv"));
             var ordered =  rows.OrderBy(x => x.SKU).ThenBy(x => x.Date).ThenBy(x => x.Store);
             var promotions = GetPromotions(ordered);
             ExcelReader.WriteToFile(promotions);
@@ -47,14 +46,14 @@ namespace SpreadSheetReader
                 // Same Date, Same SKU - Then add the store in 
                 if (currentPromotion.EndDate == row.Date && row.SKU == currentPromotion.Sku)
                 {
-                    currentPromotion.IncrementStoreCountAndVolume(row.Store, row.Volume);
+                    currentPromotion.IncrementStoreCountAndVolume(row.Store, row.Volume, row.ActualPrice);
                     continue;
                 }
                 // RowDate is day after Previous Promotion End Date && Same SKU -
                 if (row.Date == currentPromotion.EndDate.AddDays(1) && row.SKU == currentPromotion.Sku)
                 {
                     currentPromotion.EndDate = row.Date;
-                    currentPromotion.IncrementStoreCountAndVolume(row.Store, row.Volume);
+                    currentPromotion.IncrementStoreCountAndVolume(row.Store, row.Volume, row.ActualPrice);
                 }
             }
             if (currentPromotion != null)

@@ -13,8 +13,7 @@ namespace SpreadSheetReader
             StartDate = startdate;
             EndDate = endDate;
             Sku = sku;
-            InitialPrice = price;
-            DaysRaninEachStore = new Dictionary<string, StoreVolume>() { { store, new StoreVolume(1, volume) } };
+            DaysRaninEachStore = new Dictionary<string, StoreVolume>() { { store, new StoreVolume(1, volume, price) } };
         }
 
         public Guid Id { get; set; }
@@ -24,11 +23,11 @@ namespace SpreadSheetReader
         public double InitialPrice { get; set; }
         public Dictionary<string, StoreVolume> DaysRaninEachStore { get; set; }
 
-        public void IncrementStoreCountAndVolume(string store, double volume)
+        public void IncrementStoreCountAndVolume(string store, double volume, double priceOnDay)
         {
-            IncrementStoreDate(store, volume);
+            IncrementStoreDate(store, volume, priceOnDay);
         }
-        private void IncrementStoreDate(string store, double volumeOnDay)
+        private void IncrementStoreDate(string store, double volumeOnDay, double priceOnDay)
         {
             if (DaysRaninEachStore.TryGetValue(store, out var storeCount))
             {
@@ -37,7 +36,7 @@ namespace SpreadSheetReader
             }
             else
             {
-                DaysRaninEachStore.Add(store, new StoreVolume(1, volumeOnDay));
+                DaysRaninEachStore.Add(store, new StoreVolume(1, volumeOnDay, priceOnDay));
             }
 
         }
@@ -45,12 +44,16 @@ namespace SpreadSheetReader
 
     public class StoreVolume
     {
-        public StoreVolume(int initialDays, double dayOneVolume)
+        public StoreVolume(int initialDays, double dayOneVolume, double price)
         {
             DaysRanInStore = initialDays;
             TotalVolume = dayOneVolume;
+            InitialPrice = price;
         }
+
+        public double InitialPrice { get; set; }
         public int DaysRanInStore { get; set; }
         public double TotalVolume { get; set; }
+
     }
 }
