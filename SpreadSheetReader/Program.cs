@@ -14,13 +14,14 @@ namespace SpreadSheetReader
     {
         static void Main(string[] args)
         {
-            var rows = ExcelReader.ParseRows(ExcelReader.getExcelDump(@"C:\Users\andy.bainton\Documents\TestData.csv"));
+            var rows = ExcelReader.ParsePromotionRows(ExcelReader.getExcelDump(@"C:\Users\andy.bainton\Documents\TestData.csv"));
+            var storeCount = ExcelReader.GetStoreCount(ExcelReader.getExcelDump(@"C:\Users\andy.bainton\Documents\TestHierarchy.csv"));
             var ordered =  rows.OrderBy(x => x.Store).ThenBy(x => x.SKU).ThenBy(x => x.Date);
-            var promotions = GetPromotions(ordered);
+            var promotions = GetStoreLevelPromotions(ordered);
             ExcelReader.WriteToFile(promotions);
         }
 
-        private static IEnumerable<Promotion> GetPromotions(IEnumerable<ExcelRow> OrderedRows)
+        private static IEnumerable<Promotion> GetStoreLevelPromotions(IEnumerable<ExcelRow> OrderedRows)
         {
             var result = new List<Promotion>();
             Promotion currentPromotion = null;

@@ -41,7 +41,24 @@ namespace SpreadSheetReader.Persistence
             File.WriteAllText(filePath, sb.ToString());
         }
 
-        public static IEnumerable<ExcelRow> ParseRows(List<string[]> dump)
+        public static Dictionary<string, int> GetStoreCount(List<string[]> dump)
+        {
+            var result = new Dictionary<string, int>();
+            foreach(var row in dump)
+            {
+                var store = row[1];
+                if(result.TryGetValue(store, out int numberOfStores))
+                {
+                    result[store]++;
+                } else 
+                {
+                    result.Add(store, 1);
+                }
+            }
+            return result;
+        }
+
+        public static IEnumerable<ExcelRow> ParsePromotionRows(List<string[]> dump)
         {
             foreach (var row in dump)
             {
