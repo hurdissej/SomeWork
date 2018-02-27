@@ -7,7 +7,7 @@ namespace SpreadSheetReader
     {
         static void Main(string[] args)
         {
-            var rows = ExcelReader.ParsePromotionRows(ExcelReader.getExcelDump(@"C:\Users\elliot.hurdiss\Documents\OrderedDataSet.csv")).ToList();
+            var rows = ExcelReader.ParsePromotionRows(ExcelReader.getExcelDump(@"InsertPathToFileHere")).ToList();
             var promotions = StoreCountPromotionProvider.GetStoreCountPromotions(rows);
             ExcelReader.WriteToFile(promotions);
         }
