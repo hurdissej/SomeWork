@@ -6,7 +6,6 @@ namespace SpreadSheetReader
 {
     public class Promotion
     {
-
         public Promotion(DateTime startdate, DateTime endDate, double price, string sku, int storeCount, double volume, string customer)
         {
             Id = Guid.NewGuid();

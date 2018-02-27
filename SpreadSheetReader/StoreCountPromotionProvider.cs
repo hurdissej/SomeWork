@@ -6,7 +6,7 @@ namespace SpreadSheetReader
 {
     public static class StoreCountPromotionProvider
     {
-        public static IEnumerable<Promotion> GetStoreCountPromotions(List<ExcelRow> promotionRows)
+        public static IEnumerable<Promotion> GetStoreCountPromotions(List<ExcelRow> promotionRows, string directory)
         {
             var results = new List<Promotion>();
             var storeCount = promotionRows.Select(x => new {x.Customer, x.Store})
