@@ -29,10 +29,21 @@ namespace SpreadSheetReader.Persistence
             string date = DateTime.Now.ToString("yy-MM-dd") + "-" + DateTime.Now.Hour + "_" + DateTime.Now.Minute;
             var filePath = $@"C:\Users\elliot.hurdiss\Documents\PromotionOutput-{date}.csv";
             var result = new List<string[]>();
-            result.Add(new[] { "PromotionID", "StartDate", "EndDate", "SkuCode", "Promoted Price", "Store","Volume" });
+            result.Add(new[] { "PromotionID", "Customer", "StartDate", "EndDate", "SkuCode", "Average Promoted Price", "Standard Deviation", "Store","Volume"});
             foreach (var promotion in promotions)
             {
-                result.Add( new[] { promotion.Id.ToString("N"), promotion.StartDate.ToString("d"), promotion.EndDate.ToString("d"), promotion.Sku, promotion.PromotedPrice.ToString("N"), promotion.NumberOfStores.ToString(), promotion.Volume.ToString() });
+                result.Add( new[]
+                {
+                    promotion.Id.ToString("N"),
+                    promotion.Customer,
+                    promotion.StartDate.ToString("d"),
+                    promotion.EndDate.ToString("d"),
+                    promotion.Sku,
+                    promotion.PromotedPrice.ToString("N"),
+                    promotion.StandardDeviation.ToString("N"),
+                    promotion.NumberOfStores.ToString(),
+                    promotion.Volume.ToString()
+                });
             }
             StringBuilder sb = new StringBuilder();
             foreach (string[] t in result)
@@ -41,31 +52,14 @@ namespace SpreadSheetReader.Persistence
             File.WriteAllText(filePath, sb.ToString());
         }
 
-        public static Dictionary<string, int> GetStoreCount(List<string[]> dump)
-        {
-            var result = new Dictionary<string, int>();
-            foreach(var row in dump)
-            {
-                var store = row[0];
-                if(result.TryGetValue(store, out int numberOfStores))
-                {
-                    result[store]++;
-                } else 
-                {
-                    result.Add(store, 1);
-                }
-            }
-            return result;
-        }
-
         public static IEnumerable<ExcelRow> ParsePromotionRows(List<string[]> dump)
         {
             foreach (var row in dump)
             {
                 var date = Convert.ToDateTime(row[0]);
                 var actualPrice = Convert.ToDouble(row[4]);
-                var basePrice = Convert.ToDouble(row[6]);
-                var volume = Convert.ToDouble(row[5]);
+                var basePrice = Convert.ToDouble(row[5]);
+                var volume = Convert.ToDouble(row[6]);
                 yield return new ExcelRow
                 {
                     Date = date,

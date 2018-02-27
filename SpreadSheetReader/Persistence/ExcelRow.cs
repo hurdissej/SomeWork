@@ -13,5 +13,6 @@ namespace SpreadSheetReader
         public double ActualPrice { get; set; }
         public double BasePrice { get; set; }
         public double Volume { get; set; }
+        public int NumberOfStores { get; set; }
     }
 }

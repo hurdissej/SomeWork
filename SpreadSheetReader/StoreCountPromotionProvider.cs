@@ -1,87 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using SpreadSheetReader.Persistence;
 
 namespace SpreadSheetReader
 {
-    public class DistinctPriceRow
-    {
-        public double ActualPrice { get; set; }
-        public double BasePrice { get; set; }
-        public string SKU { get; set; }
-    }
     public static class StoreCountPromotionProvider
     {
         public static IEnumerable<Promotion> GetStoreCountPromotions(List<ExcelRow> promotionRows)
         {
-            // Result list
             var results = new List<Promotion>();
-            var storeCount = ExcelReader.GetStoreCount(ExcelReader.getExcelDump(@"C:\Users\elliot.hurdiss\Documents\TestHierarchy.csv"));
-            // Group promotionRows
-            var groupedPromotion = promotionRows.GroupBy(x => new {x.Date, x.ActualPrice, x.BasePrice, x.SKU, x.Customer}).Select(
+            var storeCount = promotionRows.Select(x => new {x.Customer, x.Store})
+                .Distinct()
+                .GroupBy(x => x.Customer)
+                .ToDictionary(y=> y.Key, y => y.Count());
+            
+            var groupedPromotion = promotionRows
+                .Where(x => IsPromotedDay(x.BasePrice, x.ActualPrice))
+                .GroupBy(x => new { x.Date, x.ActualPrice, x.SKU, x.Customer })
+                .Select(
                 y => new ExcelRow
                 {
                     Customer = y.Key.Customer,
                     ActualPrice = y.Key.ActualPrice,
-                    BasePrice = y.Key.BasePrice,
+                    BasePrice = y.Average(x => x.BasePrice),
                     Date = y.Key.Date,
                     SKU = y.Key.SKU,
-                    Store = y.Count().ToString(),
+                    NumberOfStores = y.Count(),
                     Volume = y.Sum(x => x.Volume)
                 }).ToList();
-            // Get List SKU / Prices
+            
             var uniqueSkuPrices = promotionRows
                 .Where(x => IsPromotedDay(x.BasePrice, x.ActualPrice))
-                .GroupBy(x => new {x.ActualPrice, x.SKU})
+                .GroupBy(x => new { x.ActualPrice, x.SKU })
                 .Select(y => new KeyValuePair<string, double>(y.Key.SKU, y.Key.ActualPrice));
-            // Group SKU prices if possible (do later)
 
-            // Loop Through Prices
             foreach (var uniquePrice in uniqueSkuPrices)
             {
-                // Get Days at that price
                 var daysAtPrice = groupedPromotion
                     .Where(x => x.ActualPrice == uniquePrice.Value)
                     .Where(x => x.SKU == uniquePrice.Key)
                     .OrderBy(x => x.Date);
-                // Set current promotion
                 Promotion currentPromotion = null;
-                //Promo Starts when store count goes over 60% - new promotions
                 foreach (var day in daysAtPrice)
                 {
-                    var storeCountOnDay = Convert.ToInt32(day.Store);
-                    var totalStoreCount = storeCount[day.Customer];
-                    if (storeCountOnDay < totalStoreCount * 0.1)
+                    if (currentPromotion == null)
                     {
-                        if (currentPromotion != null)
-                        {
-                            results.Add(currentPromotion);
-                            currentPromotion = null;
-                        }
+                        currentPromotion = new Promotion(day.Date, day.Date, day.ActualPrice, day.SKU, day.NumberOfStores, day.Volume, day.Customer);
                         continue;
                     }
-                    if (currentPromotion == null )
-                    {
-                        if(storeCountOnDay > totalStoreCount * 0.6)
-                            currentPromotion = new Promotion(day.Date, day.Date, day.ActualPrice, day.SKU, day.Store, day.Volume);
-                        continue;
-                    }
-                    if (currentPromotion.EndDate.AddDays(1) == day.Date)
+                    if (day.Date >= currentPromotion.EndDate && day.Date <= currentPromotion.EndDate.AddDays(5))
                     {
                         currentPromotion.EndDate = day.Date;
                         currentPromotion.Volume += day.Volume;
+                        continue;
                     }
-
+                    results.Add(currentPromotion);
+                    currentPromotion = new Promotion(day.Date, day.Date, day.ActualPrice, day.SKU, day.NumberOfStores, day.Volume, day.Customer);
                 }
+                results.Add(currentPromotion);
             }
-            return results;
+
+            var grouped = results
+                .GroupBy(x => new {x.Customer, x.Sku, x.StartDate, x.EndDate})
+                .Select(y => new Promotion(y.Key.StartDate, y.Key.EndDate, y.Average(x => x.PromotedPrice), y.Key.Sku,
+                    y.Sum(x => x.NumberOfStores), y.Sum(x => x.Volume), y.Key.Customer)
+                {
+                    NumberOfStoresInCustomerGroup = storeCount[y.Key.Customer],
+                    StandardDeviation =Math.Sqrt(y.Sum(d => Math.Pow(d.PromotedPrice - y.Average(x => x.PromotedPrice), 2)) / y.Count())
+                })
+                .OrderBy(x => x.Customer)
+                .ThenBy(x => x.Sku)
+                .ThenBy(x => x.StartDate);
+
+
+            var joinedPromotions = new List<Promotion>();
+
+            Promotion currentPromo = null;
+
+            foreach (var promotion in grouped)
+            {
+                if (currentPromo == null)
+                {
+                    currentPromo = promotion;
+                    continue;
+                }
+                if (IsWithinAcceptableRange(currentPromo, promotion))
+                {
+                    currentPromo.EndDate = promotion.EndDate;
+                    currentPromo.Volume += promotion.Volume;
+                    continue;
+                }
+                joinedPromotions.Add(currentPromo);
+                currentPromo = promotion;
+            }
+            return joinedPromotions.Where(x => EnoughStoresInPromotion(storeCount, x));
         }
 
-
+        private static bool IsWithinAcceptableRange(Promotion currentPromo, Promotion promotion)
+        {
+            if (currentPromo.EndDate.AddDays(1) == promotion.StartDate && currentPromo.Customer == promotion.Customer && currentPromo.Sku == promotion.Sku)
+                return promotion.PromotedPrice < currentPromo.PromotedPrice * 1.10 && promotion.PromotedPrice > currentPromo.PromotedPrice * 0.9;
+            return false;
+        }
         private static bool IsPromotedDay(double basePrice, double actualPrice) => actualPrice < basePrice * 0.95;
-
+        private static bool EnoughStoresInPromotion(Dictionary<string, int> storeCount, Promotion row) => row.NumberOfStores > storeCount[row.Customer] * 0.25;
     }
 }
