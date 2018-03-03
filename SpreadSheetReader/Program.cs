@@ -7,8 +7,8 @@ namespace SpreadSheetReader
     {
         static void Main(string[] args)
         {
-            var directory = @"INSERT PATH HERE";
-            var rows = ExcelReader.ParsePromotionRows(ExcelReader.getExcelDump($@"{directory}\INSERTFILENAME.csv")).ToList();
+            var directory = "/Users/hurdissej/Promotion";
+            var rows = ExcelReader.ParsePromotionRows(ExcelReader.getExcelDump($"{directory}/BBQProvince.csv")).ToList();
             var promotions = StoreCountPromotionProvider.GetStoreCountPromotions(rows, directory);
             ExcelReader.WriteToFile(promotions, directory);
         }

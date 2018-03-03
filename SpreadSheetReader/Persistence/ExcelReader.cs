@@ -27,23 +27,24 @@ namespace SpreadSheetReader.Persistence
         public static void WriteToFile(IEnumerable<Promotion> promotions, string directory)
         {
             string date = DateTime.Now.ToString("yy-MM-dd") + "-" + DateTime.Now.Hour + "_" + DateTime.Now.Minute;
-            var filePath = $@"{directory}\PromotionOutput-{date}.csv";
+            var filePath = $"{directory}/PromotionOutput-{date}.csv";
             var result = new List<string[]>();
-            result.Add(new[] { "PromotionID", "Customer", "StartDate", "EndDate", "SkuCode", "Average Promoted Price", "Standard Deviation", "Store","Volume"});
+            result.Add(new[] { "PromotionID", "Customer", "Province", "StartDate", "EndDate", "SkuCode", "Average Promoted Price", "Standard Deviation", "PercentageOfStoresRan","Volume"});
             foreach (var promotion in promotions)
             {
                 result.Add( new[]
                 {
                     promotion.Id.ToString("N"),
-                    promotion.Customer,
+                    promotion.Customer, 
+                    String.Join(",", promotion.Province),
                     promotion.StartDate.ToString("d"),
                     promotion.EndDate.ToString("d"),
                     promotion.Sku,
                     promotion.PromotedPrice.ToString("N"),
                     promotion.StandardDeviation.ToString("N"),
-                    promotion.NumberOfStores.ToString(),
+                    promotion.PercentageOfStores.ToString("G"),
                     promotion.Volume.ToString()
-                });
+                }); 
             }
             StringBuilder sb = new StringBuilder();
             foreach (string[] t in result)
@@ -57,15 +58,16 @@ namespace SpreadSheetReader.Persistence
             foreach (var row in dump)
             {
                 var date = Convert.ToDateTime(row[0]);
-                var actualPrice = Convert.ToDouble(row[4]);
-                var basePrice = Convert.ToDouble(row[5]);
-                var volume = Convert.ToDouble(row[6]);
+                var actualPrice = Convert.ToDouble(row[5]);
+                var basePrice = Convert.ToDouble(row[6]);
+                var volume = Convert.ToDouble(row[7]);
                 yield return new ExcelRow
                 {
                     Date = date,
                     Customer = row[1],
-                    Store = row[2],
-                    SKU = row[3],
+                    Province = row[2],
+                    Store = row[3],
+                    SKU = row[4],
                     ActualPrice = actualPrice,
                     BasePrice = basePrice,
                     Volume = volume,
