@@ -14,7 +14,8 @@ namespace SpreadSheetReader
             Sku = sku;
             PromotedPrice = price;
             Volume = volume;
-            NumberOfStores = storeCount;
+            MinimumNumberOfStores = storeCount;
+            MaximumNumberOfStores = storeCount;
             NumberOfStoresInCustomerGroup = storeCountForCustomer;
             PercentageOfStores = ((double)storeCount / (double)storeCountForCustomer);
             Customer = customer;
@@ -29,7 +30,8 @@ namespace SpreadSheetReader
         public List<string> Province { get; set; }
         public double PromotedPrice { get; set; }
         public double Volume { get; set; }
-        public int NumberOfStores { get; set; }
+        public int MinimumNumberOfStores { get; set; }
+        public int MaximumNumberOfStores { get; set; }
         public int NumberOfStoresInCustomerGroup { get; set; }
         public double PercentageOfStores { get; set; }
         public double StandardDeviation { get; set; }

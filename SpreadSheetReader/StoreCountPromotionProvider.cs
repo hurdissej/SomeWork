@@ -51,6 +51,8 @@ namespace SpreadSheetReader
                     }
                     if (day.Date >= currentPromotion.EndDate && day.Date <= currentPromotion.EndDate.AddDays(5))
                     {
+                        currentPromotion.MinimumNumberOfStores =  day.NumberOfStores < currentPromotion.MinimumNumberOfStores ? day.NumberOfStores : currentPromotion.MinimumNumberOfStores;
+                        currentPromotion.MaximumNumberOfStores =  day.NumberOfStores > currentPromotion.MaximumNumberOfStores ? day.NumberOfStores : currentPromotion.MaximumNumberOfStores;
                         currentPromotion.EndDate = day.Date;
                         currentPromotion.Volume += day.Volume;
                         continue;
@@ -63,9 +65,9 @@ namespace SpreadSheetReader
 
             var grouped = results
                 .GroupBy(x => new {x.Customer, x.Sku, x.StartDate, x.EndDate})
-                .Select(y => new Promotion(y.Key.StartDate, y.Key.EndDate, y.Average(x => x.PromotedPrice), y.Key.Sku,
-                    y.Sum(x => x.NumberOfStores), y.Sum(x => x.Volume), y.Key.Customer, storeCount[y.Key.Customer], y.SelectMany(s => s.Province).Distinct().ToList())
+                .Select(y => new Promotion(y.Key.StartDate, y.Key.EndDate, y.Average(x => x.PromotedPrice), y.Key.Sku, y.Sum(x => x.MaximumNumberOfStores), y.Sum(x => x.Volume), y.Key.Customer, storeCount[y.Key.Customer], y.SelectMany(s => s.Province).Distinct().ToList())
                 {
+                    MinimumNumberOfStores = y.Min(x => x.MinimumNumberOfStores),
                     NumberOfStoresInCustomerGroup = storeCount[y.Key.Customer],
                     StandardDeviation =Math.Sqrt(y.Sum(d => Math.Pow(d.PromotedPrice - y.Average(x => x.PromotedPrice), 2)) / y.Count())
                 })
@@ -87,6 +89,8 @@ namespace SpreadSheetReader
                 }
                 if (IsWithinAcceptableRange(currentPromo, promotion))
                 {
+                    currentPromo.MinimumNumberOfStores =  promotion.MinimumNumberOfStores < currentPromo.MinimumNumberOfStores ? promotion.MinimumNumberOfStores : currentPromo.MinimumNumberOfStores;
+                    currentPromo.MaximumNumberOfStores =  promotion.MaximumNumberOfStores < currentPromo.MaximumNumberOfStores ? promotion.MaximumNumberOfStores : currentPromo.MaximumNumberOfStores;
                     currentPromo.EndDate = promotion.EndDate;
                     currentPromo.Volume += promotion.Volume;
                     var newProvinces = promotion.Province.Where(p => promotion.Province.All(p2 => p2 != p)); 
