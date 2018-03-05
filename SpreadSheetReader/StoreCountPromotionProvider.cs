@@ -90,7 +90,7 @@ namespace SpreadSheetReader
                 if (IsWithinAcceptableRange(currentPromo, promotion))
                 {
                     currentPromo.MinimumNumberOfStores =  promotion.MinimumNumberOfStores < currentPromo.MinimumNumberOfStores ? promotion.MinimumNumberOfStores : currentPromo.MinimumNumberOfStores;
-                    currentPromo.MaximumNumberOfStores =  promotion.MaximumNumberOfStores < currentPromo.MaximumNumberOfStores ? promotion.MaximumNumberOfStores : currentPromo.MaximumNumberOfStores;
+                    currentPromo.MaximumNumberOfStores =  promotion.MaximumNumberOfStores > currentPromo.MaximumNumberOfStores ? promotion.MaximumNumberOfStores : currentPromo.MaximumNumberOfStores;
                     currentPromo.EndDate = promotion.EndDate;
                     currentPromo.Volume += promotion.Volume;
                     var newProvinces = promotion.Province.Where(p => promotion.Province.All(p2 => p2 != p)); 
