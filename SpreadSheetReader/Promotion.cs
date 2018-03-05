@@ -6,7 +6,7 @@ namespace SpreadSheetReader
 {
     public class Promotion
     {
-        public Promotion(DateTime startdate, DateTime endDate, double price, string sku, int storeCount, double volume, string customer, int storeCountForCustomer, string province)
+        public Promotion(DateTime startdate, DateTime endDate, double price, string sku, int storeCount, double volume, string customer, int storeCountForCustomer, List<string> province)
         {
             Id = Guid.NewGuid();
             StartDate = startdate;
@@ -18,7 +18,7 @@ namespace SpreadSheetReader
             NumberOfStoresInCustomerGroup = storeCountForCustomer;
             PercentageOfStores = ((double)storeCount / (double)storeCountForCustomer);
             Customer = customer;
-            Province = new List<string>{province};
+            Province = province;
         }
 
         public Guid Id { get; set; }

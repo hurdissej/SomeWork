@@ -16,10 +16,11 @@ namespace SpreadSheetReader
             
             var groupedPromotion = promotionRows
                 .Where(x => IsPromotedDay(x.BasePrice, x.ActualPrice))
-                .GroupBy(x => new { x.Date, x.ActualPrice, x.SKU, x.Customer })
+                .GroupBy(x => new { x.Date, x.ActualPrice, x.SKU, x.Customer, x.Province })
                 .Select(
                 y => new ExcelRow
                 {
+                    Province =  y.Key.Province,
                     Customer = y.Key.Customer,
                     ActualPrice = y.Key.ActualPrice,
                     BasePrice = y.Average(x => x.BasePrice),
@@ -45,7 +46,7 @@ namespace SpreadSheetReader
                 {
                     if (currentPromotion == null)
                     {
-                        currentPromotion = new Promotion(day.Date, day.Date, day.ActualPrice, day.SKU, day.NumberOfStores, day.Volume, day.Customer, storeCount[day.Customer], day.Province);
+                        currentPromotion = new Promotion(day.Date, day.Date, day.ActualPrice, day.SKU, day.NumberOfStores, day.Volume, day.Customer, storeCount[day.Customer], new List<string>{day.Province});
                         continue;
                     }
                     if (day.Date >= currentPromotion.EndDate && day.Date <= currentPromotion.EndDate.AddDays(5))
@@ -55,17 +56,16 @@ namespace SpreadSheetReader
                         continue;
                     }
                     results.Add(currentPromotion);
-                    currentPromotion = new Promotion(day.Date, day.Date, day.ActualPrice, day.SKU, day.NumberOfStores, day.Volume, day.Customer, storeCount[day.Customer], day.Province);
+                    currentPromotion = new Promotion(day.Date, day.Date, day.ActualPrice, day.SKU, day.NumberOfStores, day.Volume, day.Customer, storeCount[day.Customer], new List<string> { day.Province });
                 }
                 results.Add(currentPromotion);
             }
 
             var grouped = results
-                .GroupBy(x => new {x.Province, x.Customer, x.Sku, x.StartDate, x.EndDate})
+                .GroupBy(x => new {x.Customer, x.Sku, x.StartDate, x.EndDate})
                 .Select(y => new Promotion(y.Key.StartDate, y.Key.EndDate, y.Average(x => x.PromotedPrice), y.Key.Sku,
-                    y.Sum(x => x.NumberOfStores), y.Sum(x => x.Volume), y.Key.Customer, storeCount[y.Key.Customer], y.Key.Province.First())
+                    y.Sum(x => x.NumberOfStores), y.Sum(x => x.Volume), y.Key.Customer, storeCount[y.Key.Customer], y.SelectMany(s => s.Province).Distinct().ToList())
                 {
-                    Province = y.Key.Province,
                     NumberOfStoresInCustomerGroup = storeCount[y.Key.Customer],
                     StandardDeviation =Math.Sqrt(y.Sum(d => Math.Pow(d.PromotedPrice - y.Average(x => x.PromotedPrice), 2)) / y.Count())
                 })
@@ -89,7 +89,7 @@ namespace SpreadSheetReader
                 {
                     currentPromo.EndDate = promotion.EndDate;
                     currentPromo.Volume += promotion.Volume;
-                    var newProvinces = promotion.Province.Where(p => !promotion.Province.Any(p2 => p2 == p)); 
+                    var newProvinces = promotion.Province.Where(p => promotion.Province.All(p2 => p2 != p)); 
                     if(newProvinces.Any())
                         currentPromo.Province.AddRange(newProvinces);
                     continue;

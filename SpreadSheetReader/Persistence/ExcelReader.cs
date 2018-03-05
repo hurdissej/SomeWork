@@ -29,7 +29,7 @@ namespace SpreadSheetReader.Persistence
             string date = DateTime.Now.ToString("yy-MM-dd") + "-" + DateTime.Now.Hour + "_" + DateTime.Now.Minute;
             var filePath = $"{directory}/PromotionOutput-{date}.csv";
             var result = new List<string[]>();
-            result.Add(new[] { "PromotionID", "Customer", "Province", "StartDate", "EndDate", "SkuCode", "Average Promoted Price", "Standard Deviation", "PercentageOfStoresRan","Volume"});
+            result.Add(new[] { "PromotionID", "Customer", "Province", "StartDate", "EndDate", "SkuCode", "Average Promoted Price", "Standard Deviation", "Number Of Stores Ran" , "PercentageOfStoresRan","Volume"});
             foreach (var promotion in promotions)
             {
                 result.Add( new[]
@@ -42,6 +42,7 @@ namespace SpreadSheetReader.Persistence
                     promotion.Sku,
                     promotion.PromotedPrice.ToString("N"),
                     promotion.StandardDeviation.ToString("N"),
+                    promotion.NumberOfStores.ToString("N"),
                     promotion.PercentageOfStores.ToString("G"),
                     promotion.Volume.ToString()
                 }); 
