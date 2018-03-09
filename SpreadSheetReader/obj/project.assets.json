@@ -2298,7 +2298,7 @@
       ]
     },
     "System.Linq.Queryable/4.0.1": {
-      "sha512": "T2dnz/FyXVUlpNdjwUVVp2i3SnEKm3/20ktjJpkLD6BQrTA7iijO/pBBJoEk7ihIC9Aj/qZFIOYZcM0ZFDr/ww==",
+      "sha512": "Yn/WfYe9RoRfmSLvUt2JerP0BTGGykCZkQPgojaxgzF2N0oPo+/AhB8TXOpdCcNlrG3VRtsamtK2uzsp3cqRVw==",
       "type": "package",
       "path": "system.linq.queryable/4.0.1",
       "files": [
@@ -3333,28 +3333,33 @@
     ]
   },
   "packageFolders": {
-    "/Users/hurdissej/.nuget/packages/": {},
-    "/usr/local/share/dotnet/sdk/NuGetFallbackFolder": {}
+    "C:\\Users\\elliot.hurdiss\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
+    "restoreSettings": {
+      "hideWarningsAndErrors": true
+    },
     "restore": {
-      "projectUniqueName": "/Users/hurdissej/dev/somework/SpreadSheetReader/SpreadSheetReader.csproj",
+      "projectUniqueName": "C:\\Users\\elliot.hurdiss\\source\\repos\\SpreadSheetReader\\SpreadSheetReader\\SpreadSheetReader.csproj",
       "projectName": "SpreadSheetReader",
-      "projectPath": "/Users/hurdissej/dev/somework/SpreadSheetReader/SpreadSheetReader.csproj",
-      "packagesPath": "/Users/hurdissej/.nuget/packages/",
-      "outputPath": "/Users/hurdissej/dev/somework/SpreadSheetReader/obj/",
+      "projectPath": "C:\\Users\\elliot.hurdiss\\source\\repos\\SpreadSheetReader\\SpreadSheetReader\\SpreadSheetReader.csproj",
+      "packagesPath": "C:\\Users\\elliot.hurdiss\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\elliot.hurdiss\\source\\repos\\SpreadSheetReader\\SpreadSheetReader\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "/Users/hurdissej/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\elliot.hurdiss\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3371,22 +3376,22 @@
     "frameworks": {
       "netcoreapp2.0": {
         "dependencies": {
+          "Microsoft.EntityFrameworkCore": {
+            "target": "Package",
+            "version": "2.0.1"
+          },
           "Microsoft.NETCore.App": {
             "target": "Package",
             "version": "2.0.0",
             "autoReferenced": true
           },
-          "Microsoft.EntityFrameworkCore": {
+          "System.Data.SqlClient": {
             "target": "Package",
-            "version": "2.0.1"
+            "version": "4.4.2"
           },
           "Microsoft.EntityFrameworkCore.SqlServer": {
             "target": "Package",
             "version": "2.0.1"
-          },
-          "System.Data.SqlClient": {
-            "target": "Package",
-            "version": "4.4.2"
           }
         },
         "imports": [
